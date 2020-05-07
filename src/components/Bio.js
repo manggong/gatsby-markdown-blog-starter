@@ -1,10 +1,10 @@
-import React from 'react'
-import { Follow } from 'react-twitter-widgets'
-import styles from './Bio.module.scss'
+import React from "react";
+import { Follow } from "react-twitter-widgets";
+import styles from "./Bio.module.scss";
 
 const Bio = ({ config, expanded }) => (
   <>
-    <img
+    {/* <img
       className={styles.avatar}
       src={config.userAvatar}
       alt={config.userName}
@@ -17,8 +17,8 @@ const Bio = ({ config, expanded }) => (
         username={config.userTwitter}
         options={{ count: expanded ? true : 'none' }}
       />
-    </p>
+    </p> */}
   </>
-)
+);
 
-export default Bio
+export default Bio;
