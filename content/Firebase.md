@@ -1,6 +1,6 @@
 ---
 date: 2020-06-19
-title: "Python 함수"
+title: "To create chatting website with firebase"
 cover: "https://unsplash.it/400/300/?random?BoldMage"
 categories:
   - Firebase
@@ -67,8 +67,73 @@ if (firebaseConfig) {
 ```
 
 8. 함수정의
-9. Data Modeling
 
-#### Firebase REST Doc
+```javascript
+function signIn() {
+  // Sign into Firebase using popup auth & Google as the identity provider.
+  var provider = new firebase.auth.GoogleAuthProvider();
+  firebase.auth().signInWithPopup(provider);
+}
+
+// firebase.auth()로 Oauth 사용
+```
+
+9. CR
+
+- Create
+
+```javascript
+function saveMessage(messageText) {
+  // TODO 7: Push a new message to Firebase.
+  return firebase
+    .firestore()
+    .collection("messages")
+    .add({
+      name: getUserName(),
+      text: messageText,
+      profilePicUrl: getProfilePicUrl(),
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    })
+    .catch(function(error) {
+      console.error("Error writing new message to database", error);
+    });
+  // firebase database를 이용해서 collection정의 후 작성
+}
+```
+
+- Read
+
+```javascript
+function loadMessages() {
+  // Create the query to load the last 12 messages and listen for new ones.
+  var query = firebase.firestore()
+                  .collection('messages')
+                  .orderBy('timestamp', 'desc')
+                  .limit(12);
+  
+  // Start listening to the query.
+  query.onSnapshot(function(snapshot) {
+    snapshot.docChanges().forEach(function(change) {
+      if (change.type === 'removed') {
+        deleteMessage(change.doc.id);
+      } else {
+        var message = change.doc.data();
+        displayMessage(change.doc.id, message.timestamp, message.name,
+                       message.text, message.profilePicUrl, message.imageUrl);
+      }
+    });
+  });
+}
+```
+
+
+
+
+
+#### Firebase Doc
+
+- [Firebase basic](https://codelabs.developers.google.com/codelabs/firebase-web/?authuser=0#0)
 
 - [REST API Doc](https://firebase.google.com/docs/reference/rest/database)
+- 
+
