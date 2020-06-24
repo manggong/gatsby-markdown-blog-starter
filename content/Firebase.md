@@ -92,7 +92,7 @@ function saveMessage(messageText) {
       name: getUserName(),
       text: messageText,
       profilePicUrl: getProfilePicUrl(),
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
     })
     .catch(function(error) {
       console.error("Error writing new message to database", error);
@@ -106,34 +106,86 @@ function saveMessage(messageText) {
 ```javascript
 function loadMessages() {
   // Create the query to load the last 12 messages and listen for new ones.
-  var query = firebase.firestore()
-                  .collection('messages')
-                  .orderBy('timestamp', 'desc')
-                  .limit(12);
-  
+  var query = firebase
+    .firestore()
+    .collection("messages")
+    .orderBy("timestamp", "desc")
+    .limit(12);
+
   // Start listening to the query.
   query.onSnapshot(function(snapshot) {
     snapshot.docChanges().forEach(function(change) {
-      if (change.type === 'removed') {
+      if (change.type === "removed") {
         deleteMessage(change.doc.id);
       } else {
         var message = change.doc.data();
-        displayMessage(change.doc.id, message.timestamp, message.name,
-                       message.text, message.profilePicUrl, message.imageUrl);
+        displayMessage(
+          change.doc.id,
+          message.timestamp,
+          message.name,
+          message.text,
+          message.profilePicUrl,
+          message.imageUrl
+        );
       }
     });
   });
 }
 ```
 
+10. image upload
 
+```javascript
+function saveImageMessage(file) {
+  // TODO 9: Posts a new image as a message.
+  firebase
+    .firestore()
+    .collection("messages")
+    .add({
+      name: getUserName(),
+      imageUrl: LOADING_IMAGE_URL,
+      profilePicUrl: getProfilePicUrl(),
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    })
+    .then(function(messageRef) {
+      // 2 - Upload the image to Cloud Storage.
+      const filePath =
+        firebase.auth().currentUser.uid + "/" + messageRef.id + "/" + file.name;
+      return firebase
+        .storage()
+        .ref(filePath)
+        .put(file)
+        .then(function(fileSnapshot) {
+          // 3 - Generate a public URL for the file.
+          return fileSnapshot.ref.getDownloadURL().then((url) => {
+            // 4 - Update the chat message placeholder with the image's URL.
+            return messageRef.update({
+              imageUrl: url,
+              storageUri: fileSnapshot.metadata.fullPath,
+            });
+          });
+        });
+    })
+    .catch(function(error) {
+      console.error(
+        "There was an error uploading a file to Cloud Storage:",
+        error
+      );
+    });
+}
+```
 
+### Push 알림 활성화 안 될 때!!!
 
+앱, 웹앱이 firebase 상에 등록되어 있어야 한다.
+
+- `http://localhost:5000/__/firebase/init.js`로 접속해서 firebase configuration 확인
+
+- `Firebase 콘솔` > 프로젝트 개요 옆 `톱니바퀴 아이콘` > `프로젝트 설정` > 화면 하단에 `내 앱` 생성
 
 #### Firebase Doc
 
 - [Firebase basic](https://codelabs.developers.google.com/codelabs/firebase-web/?authuser=0#0)
 
 - [REST API Doc](https://firebase.google.com/docs/reference/rest/database)
-- 
-
+-
