@@ -1,5 +1,5 @@
 ---
-date: 2020-06-112
+date: 2020-06-11
 title: "Vue JS 댕댕이 & 냥이"
 cover: "https://unsplash.it/400/300/?random?BoldMage"
 categories:
